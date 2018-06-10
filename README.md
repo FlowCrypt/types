@@ -1,2 +1,2 @@
-# types-openpgp
-OpenPGP TypeScript definitions
+# types
+TypeScript definitions
