@@ -356,7 +356,7 @@ declare module 'openpgp' {
                 @param algo Hash algorithm type
                 @param data Data to be hashed
             */
-            function digest(algo: enums.hash, data: string): string;
+            function digest(algo: enums.hash, data: string): Uint8Array;
 
             /** Returns the hash size in bytes of the specified hash algorithm type
                 @param algo Hash algorithm type
