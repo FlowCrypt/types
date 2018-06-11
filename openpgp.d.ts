@@ -7,6 +7,8 @@
 
 declare module 'openpgp' {
 
+    type EllipticCurve = 'curve25519'|'p256'|'p384'|'p521'|'secp256k1'|'brainpoolP256r1'|'brainpoolP384r1'|'brainpoolP512r1';
+
     export interface UserId {
         name?: string,
         email?: string,
@@ -66,7 +68,7 @@ declare module 'openpgp' {
         passphrase?: string,
         numBits?: number,
         keyExpirationTime?: number,
-        curve?: string,
+        curve?: EllipticCurve,
         date?: Date,
         subkeys?: KeyOptions[]
     }
