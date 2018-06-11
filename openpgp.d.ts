@@ -38,9 +38,10 @@ declare module 'openpgp' {
         toUserId?: UserId,
     }
 
-    export interface EncryptedMessage {
-        data: string,
-        message: string,
+    export interface EncryptResult {
+        data?: string,
+        message?: string,
+        signature?: string,
     }
 
     export interface DecryptOptions {
@@ -171,7 +172,7 @@ declare module 'openpgp' {
      * @async
      * @static
      */
-    export function encrypt(options: EncryptOptions): Promise<EncryptedMessage>;
+    export function encrypt(options: EncryptOptions): Promise<EncryptResult>;
 
     /**
      * Decrypts a message with the user's private key, a session key or a password. Either a private key,
