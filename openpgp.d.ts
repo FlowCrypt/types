@@ -512,7 +512,7 @@ declare module 'openpgp' {
 
             @param options
         */
-        function generate(options: KeyOptions): Key;
+        function generate(options: KeyOptions): Promise<Key>;
 
         /** Reads an OpenPGP armored text and returns one or multiple key objects
 
