@@ -64,13 +64,27 @@ declare module 'openpgp' {
     }
 
     export interface KeyOptions {
-        userIds?: UserId[],
+        userIds: UserId[], // generating a key with no user defined results in error
         passphrase?: string,
         numBits?: number,
         keyExpirationTime?: number,
         curve?: EllipticCurve,
         date?: Date,
         subkeys?: KeyOptions[]
+    }
+
+    /**
+     * Intended for internal use with openpgp.key.generate()
+     * It's recommended that users choose openpgp.generateKey() that requires KeyOptions instead
+     */
+    export interface FullKeyOptions {
+        userIds: UserId[],
+        passphrase?: string,
+        numBits?: number,
+        keyExpirationTime?: number,
+        curve?: EllipticCurve,
+        date?: Date,
+        subkeys: KeyOptions[], // required unline KeyOptions.subkeys
     }
 
     export interface Keyid {
@@ -514,7 +528,7 @@ declare module 'openpgp' {
 
             @param options
         */
-        function generate(options: KeyOptions): Promise<Key>;
+        function generate(options: FullKeyOptions): Promise<Key>;
 
         /** Reads an OpenPGP armored text and returns one or multiple key objects
 
