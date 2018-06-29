@@ -723,6 +723,10 @@ declare module 'openpgp' {
             @param bin An array of (binary) integers to convert
         */
         function Uint8Array2str(bin: Uint8Array): string;
+  
+        function parseUserId(userid: string): UserId;
+  
+        function formatUserId(userid: UserId): string;
     }
   
   }
