@@ -302,6 +302,20 @@ declare module 'openpgp' {
         var integrity_protect: boolean;
         var keyserver: string;
         var debug: boolean;
+        var deflate_level: number;
+        var aead_protect: boolean;
+        var ignore_mdc_error: boolean;
+        var checksum_required: boolean;
+        var rsa_blinding: boolean;
+        var password_collision_check: boolean;
+        var revocations_expire: boolean;
+        var use_native: boolean;
+        var zero_copy: boolean;
+        var tolerant: boolean;
+        var versionstring: string;
+        var commentstring: string;
+        var keyserver: string;
+        var node_store: string;
     }
   
     export namespace crypto {
