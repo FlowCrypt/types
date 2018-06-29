@@ -536,7 +536,7 @@ declare module 'openpgp' {
             primaryKey: packet.PublicKey;
             toPublic(): Key;
             update(key: Key): void;
-            verifyPrimaryKey(): enums.keyStatus;
+            verifyPrimaryKey(): Promise<enums.keyStatus>;
         }
   
         /** Generates a new OpenPGP key. Currently only supports RSA keys. Primary and subkey will be of same type.
