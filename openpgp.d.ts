@@ -524,7 +524,7 @@ declare module 'openpgp' {
         /** Class that represents an OpenPGP key. Must contain a primary key. Can contain additional subkeys, signatures, user ids, user attributes.
          */
         interface Key {
-            armor(): string,
+            armor(): string;
             decrypt(passphrase: string): boolean;
             getExpirationTime(): Date;
             getKeyIds(): Array<Keyid>;
@@ -537,6 +537,8 @@ declare module 'openpgp' {
             toPublic(): Key;
             update(key: Key): void;
             verifyPrimaryKey(): Promise<enums.keyStatus>;
+            isRevoked(): Promise<boolean>;
+            revocationSignatures: Signature[];
         }
   
         /** Generates a new OpenPGP key. Currently only supports RSA keys. Primary and subkey will be of same type.
