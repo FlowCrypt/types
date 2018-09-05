@@ -442,7 +442,7 @@ declare module 'openpgp' {
    */
   export function reformatKey(options: {
     privateKey: key.Key;
-    userIds?: string[];
+    userIds?: (string|UserId)[];
     passphrase?: string;
     keyExpirationTime?: number;
   }): Promise<KeyPair>;
