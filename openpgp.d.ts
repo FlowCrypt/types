@@ -46,8 +46,6 @@ declare module 'openpgp' {
     returnSessionKey?: boolean;
     /** (optional) use a key ID of 0 instead of the public key IDs */
     wildcard?: boolean;
-    /** (optional) override the creation date of the message signature */
-    date?: Date;
     /** (optional) user ID to sign with, e.g. { name:'Steve Sender', email:'steve@openpgp.org' } */
     fromUserId?: UserId;
     /** (optional) user ID to encrypt for, e.g. { name:'Robert Receiver', email:'robert@openpgp.org' } */
@@ -273,8 +271,6 @@ declare module 'openpgp' {
     streaming?: 'web' | 'node' | false;
     /** (optional) detached signature for verification */
     signature?: signature.Signature;
-    /** (optional) use the given date for verification instead of the current time */
-    date?: Date;
   }
 
   export interface SignOptions {
@@ -878,7 +874,7 @@ declare module 'openpgp' {
       /** Decrypt the message
           @param privateKey private key with decrypted secret data
       */
-      decrypt(privateKeys?: key.Key[] | null, passwords?: string[] | null, sessionKeys?: SessionKey[] | null): Promise<Message>;
+      decrypt(privateKeys?: key.Key[] | null, passwords?: string[] | null, sessionKeys?: SessionKey[] | null, streaming?: boolean): Promise<Message>;
 
       /** Encrypt the message
           @param keys array of keys, used to encrypt the message
@@ -891,7 +887,7 @@ declare module 'openpgp' {
 
       /** Get literal data that is the body of the message
        */
-      getLiteralData(): Uint8Array;
+      getLiteralData(): Uint8Array | null | ReadableStream<Uint8Array>;
 
       /** Returns the key IDs of the keys that signed the message
        */
@@ -899,7 +895,7 @@ declare module 'openpgp' {
 
       /** Get literal data as text
        */
-      getText(): string;
+      getText(): string | null | ReadableStream<string>;
 
       getFilename(): string | null;
 
@@ -939,18 +935,18 @@ declare module 'openpgp' {
     /** creates new message object from binary data
         @param bytes
     */
-    function fromBinary(bytes: string): Message;
+    function fromBinary(bytes: Uint8Array | ReadableStream<Uint8Array>, filename?: string, date?: Date, type?: DataPacketType): Message;
 
     /** creates new message object from text
         @param text
     */
-    function fromText(text: string): Message;
+    function fromText(text: string | ReadableStream<string>, filename?: string, date?: Date, type?: DataPacketType): Message;
 
     /** reads an OpenPGP armored message and returns a message object
 
         @param armoredText text to be parsed
     */
-    function readArmored(armoredText: string): Promise<Message>;
+    function readArmored(armoredText: string | ReadableStream<string>): Promise<Message>;
 
     /**
      * reads an OpenPGP message as byte array and returns a message object
@@ -1048,5 +1044,13 @@ declare module 'openpgp' {
     function normalizeDate(date: Date | null): Date | null;
   }
 
-}
+  export namespace stream {
+    function readToEnd<T extends Uint8Array | string>(input: ReadableStream<T> | T, concat?: (list: T[]) => T): Promise<T>;
+    // concat
+    // slice
+    // clone
+    // webToNode
+    // nodeToWeb
+  }
 
+}
