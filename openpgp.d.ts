@@ -5,6 +5,8 @@
 //                 FlowCrypt Limited <https://flowcrypt.com>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
+/* tslint:disable:only-arrow-functions variable-name max-line-length no-null-keyword */
+
 declare module 'openpgp' {
 
   type DataPacketType = 'utf8' | 'binary' | 'text' | 'mime';
