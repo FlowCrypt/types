@@ -7,6 +7,8 @@
 
 /* tslint:disable:only-arrow-functions variable-name max-line-length no-null-keyword */
 
+import { ReadableStream } from 'whatwg-streams';
+
 declare module 'openpgp' {
 
   type DataPacketType = 'utf8' | 'binary' | 'text' | 'mime';
@@ -20,6 +22,11 @@ declare module 'openpgp' {
     data: Uint8Array;
     algorithm: string;
   }
+
+  // this should not affect global NodeJS definitions, it's a mini-shim so that this doesn't show errors on the web, better solutions welcome
+  namespace NodeJS { interface ReadableStream { } }
+  /** A Node or Web stream of Uint8Array or string */
+  type Stream<T extends Uint8Array | string> = NodeJS.ReadableStream | ReadableStream<T>; // NodeJS.ReadableStream not generic, better solutions welcome
 
   export interface EncryptOptions {
     /** message to be encrypted as created by openpgp.message.fromText or openpgp.message.fromBinary */
@@ -887,7 +894,7 @@ declare module 'openpgp' {
 
       /** Get literal data that is the body of the message
        */
-      getLiteralData(): Uint8Array | null | ReadableStream<Uint8Array>;
+      getLiteralData(): Uint8Array | null | Stream<Uint8Array>;
 
       /** Returns the key IDs of the keys that signed the message
        */
@@ -895,7 +902,7 @@ declare module 'openpgp' {
 
       /** Get literal data as text
        */
-      getText(): string | null | ReadableStream<string>;
+      getText(): string | null | Stream<string>;
 
       getFilename(): string | null;
 
@@ -935,18 +942,18 @@ declare module 'openpgp' {
     /** creates new message object from binary data
         @param bytes
     */
-    function fromBinary(bytes: Uint8Array | ReadableStream<Uint8Array>, filename?: string, date?: Date, type?: DataPacketType): Message;
+    function fromBinary(bytes: Uint8Array | Stream<Uint8Array>, filename?: string, date?: Date, type?: DataPacketType): Message;
 
     /** creates new message object from text
         @param text
     */
-    function fromText(text: string | ReadableStream<string>, filename?: string, date?: Date, type?: DataPacketType): Message;
+    function fromText(text: string | Stream<string>, filename?: string, date?: Date, type?: DataPacketType): Message;
 
     /** reads an OpenPGP armored message and returns a message object
 
         @param armoredText text to be parsed
     */
-    function readArmored(armoredText: string | ReadableStream<string>): Promise<Message>;
+    function readArmored(armoredText: string | Stream<string>): Promise<Message>;
 
     /**
      * reads an OpenPGP message as byte array and returns a message object
@@ -1045,7 +1052,7 @@ declare module 'openpgp' {
   }
 
   export namespace stream {
-    function readToEnd<T extends Uint8Array | string>(input: ReadableStream<T> | T, concat?: (list: T[]) => T): Promise<T>;
+    function readToEnd<T extends Uint8Array | string>(input: Stream<T> | T, concat?: (list: T[]) => T): Promise<T>;
     // concat
     // slice
     // clone
