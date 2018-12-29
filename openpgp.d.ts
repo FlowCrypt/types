@@ -7,8 +7,6 @@
 
 /* tslint:disable:only-arrow-functions variable-name max-line-length no-null-keyword */
 
-import { ReadableStream } from 'whatwg-streams';
-
 declare module 'openpgp' {
 
   type DataPacketType = 'utf8' | 'binary' | 'text' | 'mime';
@@ -23,10 +21,15 @@ declare module 'openpgp' {
     algorithm: string;
   }
 
-  // this should not affect global NodeJS definitions, it's a mini-shim so that this doesn't show errors on the web, better solutions welcome
-  namespace NodeJS { interface ReadableStream { } }
-  /** A Node or Web stream of Uint8Array or string */
-  type Stream<T extends Uint8Array | string> = NodeJS.ReadableStream | ReadableStream<T>; // NodeJS.ReadableStream not generic, better solutions welcome
+  interface BaseStream<T extends Uint8Array | string> { }
+  interface WebStream<T extends Uint8Array | string> extends BaseStream<T> { // copied+simplified version of ReadableStream from lib.dom.d.ts
+    readonly locked: boolean; cancel(reason?: any): Promise<void>; getReader: Function; pipeThrough: Function; pipeTo: Function; tee: Function;
+  }
+  interface NodeStream<T extends Uint8Array | string> extends BaseStream<T> { // copied+simplified version of ReadableStream from @types/node/index.d.ts
+    readable: boolean; read(size?: number): string | Uint8Array; setEncoding(encoding: string): this; pause(): this; resume(): this;
+    isPaused(): boolean; pipe: Function; unpipe: Function; unshift(chunk: string): void; unshift(chunk: Uint8Array): void; wrap: Function;
+  }
+  type Stream<T extends Uint8Array | string> = WebStream<T> | NodeStream<T>;
 
   export interface EncryptOptions {
     /** message to be encrypted as created by openpgp.message.fromText or openpgp.message.fromBinary */
@@ -512,7 +515,7 @@ declare module 'openpgp' {
       /** Verify signatures of cleartext signed message
        *  @param keys array of keys to verify signatures
        */
-      verify(keys: key.Key[]): Promise<message.VerifiedSignature[]>;
+      verify(keys: key.Key[]): Promise<message.Verification[]>;
     }
 
     /**
@@ -918,7 +921,7 @@ declare module 'openpgp' {
       /** Verify message signatures
           @param keys array of keys to verify signatures
       */
-      verify(keys: key.Key[]): Promise<VerifiedSignature[]>;
+      verify(keys: key.Key[]): Promise<Verification[]>;
 
       /**
        * Append signature to unencrypted message object
@@ -933,10 +936,10 @@ declare module 'openpgp' {
 
     }
 
-    export interface VerifiedSignature {
+    export interface Verification {
       keyid: Keyid;
-      valid: boolean;
-      signature: signature.Signature;
+      verified: Promise<null | boolean>;
+      signature: Promise<signature.Signature>;
     }
 
     /** creates new message object from binary data
