@@ -253,8 +253,8 @@ declare module 'openpgp' {
   export type EncryptResult = EncryptArmorResult | EncryptBinaryResult;
 
   export interface SignArmorResult {
-    data: string;
-    signature: string;
+    data: string | Stream<string>;
+    signature: string | Stream<string>;
   }
 
   export interface SignBinaryResult {
@@ -284,11 +284,12 @@ declare module 'openpgp' {
   }
 
   export interface SignOptions {
-    data: string | Uint8Array;
-    dataType?: DataPacketType;
-    armor?: boolean;
-    detached?: boolean;
+    message: cleartext.CleartextMessage | message.Message;
     privateKeys?: key.Key | key.Key[];
+    armor?: boolean;
+    streaming?: 'web' | 'node' | false;
+    dataType?: DataPacketType;
+    detached?: boolean;
     date?: Date;
     fromUserId?: UserId;
   }
@@ -620,7 +621,7 @@ declare module 'openpgp' {
           @param algo Hash algorithm type
           @param data Data to be hashed
       */
-      function digest(algo: enums.hash, data: string): Uint8Array;
+      function digest(algo: enums.hash, data: Uint8Array): Promise<Uint8Array>;
 
       /** Returns the hash size in bytes of the specified hash algorithm type
           @param algo Hash algorithm type
