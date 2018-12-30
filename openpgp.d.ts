@@ -5,7 +5,7 @@
 //                 FlowCrypt Limited <https://flowcrypt.com>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
-/* tslint:disable:only-arrow-functions variable-name max-line-length no-null-keyword */
+/* tslint:disable:only-arrow-functions variable-name max-line-length no-null-keyword ban-types */
 
 declare module 'openpgp' {
 
@@ -27,7 +27,7 @@ declare module 'openpgp' {
   }
   interface NodeStream<T extends Uint8Array | string> extends BaseStream<T> { // copied+simplified version of ReadableStream from @types/node/index.d.ts
     readable: boolean; read(size?: number): string | Uint8Array; setEncoding(encoding: string): this; pause(): this; resume(): this;
-    isPaused(): boolean; pipe: Function; unpipe: Function; unshift(chunk: string): void; unshift(chunk: Uint8Array): void; wrap: Function;
+    isPaused(): boolean; pipe: Function; unpipe: Function; unshift(chunk: string | Uint8Array): void; wrap: Function;
   }
   type Stream<T extends Uint8Array | string> = WebStream<T> | NodeStream<T>;
 
@@ -47,7 +47,7 @@ declare module 'openpgp' {
     /** (optional) if the return values should be ascii armored or the message/signature objects */
     armor?: boolean;
     /** (optional) whether to return data as a stream. Defaults to the type of stream `message` was created from, if any. */
-    streaming?: 'web' | 'node' | false
+    streaming?: 'web' | 'node' | false;
     /** (optional) if the signature should be detached (if true, signature will be added to returned object) */
     detached?: boolean;
     /** (optional) a detached signature to add to the encrypted message */
