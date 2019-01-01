@@ -527,6 +527,8 @@ declare module 'openpgp' {
      * @static
      */
     function readArmored(armoredText: string): Promise<CleartextMessage>;
+
+    function fromText(text: string): CleartextMessage;
   }
 
   export namespace config {
