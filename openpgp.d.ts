@@ -832,7 +832,7 @@ declare module 'openpgp' {
 
     interface KeyResult {
       keys: Key[];
-      err: Error[];
+      err?: Error[];
     }
 
     type AlgorithmInfo = {
