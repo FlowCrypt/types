@@ -930,7 +930,7 @@ declare module 'openpgp' {
        * Append signature to unencrypted message object
        * @param {String|Uint8Array} detachedSignature The detached ASCII-armored or Uint8Array PGP signature
        */
-      appendSignature(detachedSignature: string | Uint8Array): void;
+      appendSignature(detachedSignature: string | Uint8Array): Promise<void>;
 
       packets: packet.List<packet.AnyPacket>;
     }
