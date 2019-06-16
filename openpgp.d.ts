@@ -31,7 +31,10 @@ declare module 'openpgp' {
   }
   type Stream<T extends Uint8Array | string> = WebStream<T> | NodeStream<T>;
 
-  export interface EncryptOptions {
+  /**
+   * EncryptArmorOptions or EncryptBinaryOptions will be used based on armor option (boolean), defaults to armoring
+   */
+  interface BaseEncryptOptions {
     /** message to be encrypted as created by openpgp.message.fromText or openpgp.message.fromBinary */
     message: message.Message;
     /** (optional) array of keys or single key, used to encrypt the message */
@@ -60,6 +63,18 @@ declare module 'openpgp' {
     fromUserId?: UserId;
     /** (optional) user ID to encrypt for, e.g. { name:'Robert Receiver', email:'robert@openpgp.org' } */
     toUserId?: UserId;
+  }
+
+  export type EncryptOptions = BaseEncryptOptions | EncryptArmorOptions | EncryptBinaryOptions;
+
+  export interface EncryptArmorOptions extends BaseEncryptOptions {
+    /** if the return values should be ascii armored or the message/signature objects */
+    armor: true;
+  }
+
+  export interface EncryptBinaryOptions extends BaseEncryptOptions {
+    /** if the return values should be ascii armored or the message/signature objects */
+    armor: false;
   }
 
   export namespace packet {
@@ -391,7 +406,9 @@ declare module 'openpgp' {
    * @async
    * @static
    */
-  export function encrypt(options: EncryptOptions): Promise<EncryptResult>;
+  export function encrypt(options: EncryptArmorOptions | BaseEncryptOptions): Promise<EncryptArmorResult>;
+
+  export function encrypt(options: EncryptBinaryOptions): Promise<EncryptBinaryResult>;
 
   /**
    * Signs a cleartext message.
@@ -787,7 +804,7 @@ declare module 'openpgp' {
       encrypt(passphrase: string | string[]): Promise<void>;
       getExpirationTime(): Promise<Date | typeof Infinity>;
       getKeyIds(): Keyid[];
-      getPrimaryUser(): any;
+      getPrimaryUser(): Promise<PrimaryUser | null>;
       getUserIds(): string[];
       isPrivate(): boolean;
       isPublic(): boolean;
@@ -812,6 +829,7 @@ declare module 'openpgp' {
     class SubKey {
       constructor(subKeyPacket: packet.SecretSubkey | packet.PublicSubkey);
       subKey: packet.SecretSubkey | packet.PublicSubkey;
+      keyPacket: packet.SecretKey;
       bindingSignatures: packet.Signature[];
       revocationSignatures: packet.Signature[];
       verify(primaryKey: packet.PublicKey | packet.SecretKey): Promise<enums.keyStatus>;
@@ -830,9 +848,14 @@ declare module 'openpgp' {
       revocationSignatures: packet.Signature[];
     }
 
+    export interface PrimaryUser {
+      index: number;
+      user: User;
+    }
+
     interface KeyResult {
       keys: Key[];
-      err?: Error[];
+      err: Error[];
     }
 
     type AlgorithmInfo = {
@@ -1080,5 +1103,5 @@ declare module 'openpgp' {
     // webToNode
     // nodeToWeb
   }
-
+  
 }
