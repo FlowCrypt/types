@@ -47,8 +47,6 @@ declare module 'openpgp' {
     sessionKey?: SessionKey;
     /** (optional) which compression algorithm to compress the message with, defaults to what is specified in config */
     compression?: enums.compression;
-    /** (optional) if the return values should be ascii armored or the message/signature objects */
-    armor?: boolean;
     /** (optional) whether to return data as a stream. Defaults to the type of stream `message` was created from, if any. */
     streaming?: 'web' | 'node' | false;
     /** (optional) if the signature should be detached (if true, signature will be added to returned object) */
@@ -79,12 +77,12 @@ declare module 'openpgp' {
 
   export namespace packet {
 
-    export interface List<PACKET_TYPE> extends Iterable<PACKET_TYPE> {
+    export class List<PACKET_TYPE> extends Array<PACKET_TYPE> {
       [index: number]: PACKET_TYPE;
       length: number;
       read(bytes: Uint8Array): void;
       write(): Uint8Array;
-      push(packet: PACKET_TYPE): void;
+      push(...packet: PACKET_TYPE[]): number;
       pop(): PACKET_TYPE;
       filter(callback: (packet: PACKET_TYPE, i: number, self: List<PACKET_TYPE>) => void): List<PACKET_TYPE>;
       filterByTag(...args: enums.packet[]): List<PACKET_TYPE>;
@@ -176,6 +174,7 @@ declare module 'openpgp' {
 
     export class OnePassSignature extends BasePacket {
       tag: enums.packet.onePassSignature;
+      correspondingSig?: Promise<Signature>;
     }
 
     export class SecretKey extends BasePrimaryKeyPacket {
@@ -406,9 +405,8 @@ declare module 'openpgp' {
    * @async
    * @static
    */
-  export function encrypt(options: EncryptArmorOptions | BaseEncryptOptions): Promise<EncryptArmorResult>;
-
   export function encrypt(options: EncryptBinaryOptions): Promise<EncryptBinaryResult>;
+  export function encrypt(options: EncryptArmorOptions | BaseEncryptOptions): Promise<EncryptArmorResult>;
 
   /**
    * Signs a cleartext message.
@@ -533,7 +531,7 @@ declare module 'openpgp' {
       /** Verify signatures of cleartext signed message
        *  @param keys array of keys to verify signatures
        */
-      verify(keys: key.Key[]): Promise<message.Verification[]>;
+      verify(keys: key.Key[], date?: Date, streaming?: boolean): Promise<message.Verification[]>;
     }
 
     /**
@@ -855,7 +853,7 @@ declare module 'openpgp' {
 
     interface KeyResult {
       keys: Key[];
-      err: Error[];
+      err?: Error[];
     }
 
     type AlgorithmInfo = {
@@ -885,7 +883,9 @@ declare module 'openpgp' {
     class Signature {
       constructor(packetlist: packet.List<packet.Signature>);
       armor(): string;
+      packets: packet.List<packet.Signature>;
     }
+
     /** reads an OpenPGP armored signature and returns a signature object
 
         @param armoredText text to be parsed
@@ -903,6 +903,8 @@ declare module 'openpgp' {
     /** Class that represents an OpenPGP message. Can be an encrypted message, signed message, compressed message or literal message
      */
     class Message {
+      constructor(packetlist: packet.List<packet.AnyPacket>);
+
       /** Returns ASCII armored text of message
        */
       armor(): string;
@@ -947,7 +949,7 @@ declare module 'openpgp' {
       /** Verify message signatures
           @param keys array of keys to verify signatures
       */
-      verify(keys: key.Key[]): Promise<Verification[]>;
+      verify(keys: key.Key[], date?: Date, streaming?: boolean): Promise<Verification[]>;
 
       /**
        * Append signature to unencrypted message object
@@ -1103,5 +1105,5 @@ declare module 'openpgp' {
     // webToNode
     // nodeToWeb
   }
-  
+
 }
