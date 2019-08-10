@@ -181,6 +181,8 @@ declare module 'openpgp' {
       tag: enums.packet.secretKey;
       isDecrypted(): boolean;
       encrypt(passphrase: string): Promise<boolean>;
+      decrypt(passphrase: string): Promise<true>;
+      encrypted: null | unknown[]; // Encrypted secret-key data, not meant for public use
     }
 
     export class Userid extends BasePacket {
@@ -798,7 +800,7 @@ declare module 'openpgp' {
     class Key {
       constructor(packetlist: packet.List<packet.AnyPacket>);
       armor(): string;
-      decrypt(passphrase: string | string[]): Promise<boolean>;
+      decrypt(passphrase: string | string[], keyId?: Keyid): Promise<boolean>;
       encrypt(passphrase: string | string[]): Promise<void>;
       getExpirationTime(): Promise<Date | typeof Infinity>;
       getKeyIds(): Keyid[];
@@ -812,7 +814,7 @@ declare module 'openpgp' {
       isRevoked(): Promise<boolean>;
       getEncryptionKey(keyid?: Keyid | null, date?: Date, userid?: UserId | null): Promise<packet.PublicSubkey | packet.SecretSubkey | packet.SecretKey | packet.PublicKey | null>;
       getSigningKey(): Promise<packet.PublicSubkey | packet.SecretSubkey | packet.SecretKey | packet.PublicKey | null>;
-      getKeys(): packet.List<packet.AnyKeyPacket>;
+      getKeys(keyId?: Keyid): (Key | SubKey)[];
       isDecrypted(): boolean;
       getFingerprint(): string;
       getCreationTime(): Date;
@@ -822,6 +824,7 @@ declare module 'openpgp' {
       subKeys: SubKey[];
       users: User[];
       revocationSignatures: packet.Signature[];
+      keyPacket: packet.PublicKey | packet.SecretKey;
     }
 
     class SubKey {
